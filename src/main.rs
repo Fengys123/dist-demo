@@ -11,6 +11,14 @@ pub struct Monitor {
 }
 
 fn main() {
+    let builder = OptsBuilder::new()
+        .ip_or_hostname(Some("127.0.0.1"))
+        .tcp_port(4002)
+        .prefer_socket(false);
+    let pool = Pool::new(builder).unwrap();
+    let mut conn = pool.get_conn().unwrap();
+
+    // create table
     let create = r"
 CREATE TABLE dist_monitor (
     idc STRING,
@@ -27,20 +35,13 @@ PARTITION BY RANGE COLUMNS (idc) (
     )
 ENGINE=mito;
     ";
-
-    let builder = OptsBuilder::new()
-        .ip_or_hostname(Some("127.0.0.1"))
-        .tcp_port(4002)
-        .prefer_socket(false);
-    let pool = Pool::new(builder).unwrap();
-    let mut conn = pool.get_conn().unwrap();
-
     match conn.query_drop(create) {
         Ok(_) => println!("create table success!"),
         Err(e) => println!("create table failed, err: {:?}", e),
     };
 
-    let count = 90;
+    // insert data
+    let count = 30000;
     for i in 0..count {
         let insert = format! {"INSERT INTO dist_monitor (idc, host, cpu, memory)
         VALUES (\"idc_{}\", \"host_{}\", 0.2, 0.3)", i, i};
