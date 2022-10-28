@@ -29,8 +29,8 @@ CREATE TABLE dist_monitor (
     TIME INDEX (ts),
     PRIMARY KEY(host))
 PARTITION BY RANGE COLUMNS (idc) (
-    PARTITION p0 VALUES LESS THAN ('host_3000'),
-    PARTITION p1 VALUES LESS THAN ('host_6000'),
+    PARTITION p0 VALUES LESS THAN ('host_3'),
+    PARTITION p1 VALUES LESS THAN ('host_6'),
     PARTITION p2 VALUES LESS THAN (MAXVALUE),
     )
 ENGINE=mito;
@@ -41,7 +41,7 @@ ENGINE=mito;
     };
 
     // insert data
-    let count = 30000;
+    let count = 60;
     for i in 0..count {
         let insert = format! {"INSERT INTO dist_monitor (idc, host, cpu, memory)
         VALUES (\"idc_{}\", \"host_{}\", 0.2, 0.3)", i, i};
